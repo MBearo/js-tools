@@ -249,4 +249,342 @@ let _MB = {
                 return true;
         }
     },
+    //去除空格  type 1-所有空格  2-前后空格  3-前空格 4-后空格
+    //trim('  1235asd',1)
+    //result：1235asd
+    trim(str, type) {
+        switch (type) {
+            case 1:
+                return str.replace(/\s+/g, "");
+            case 2:
+                return str.replace(/(^\s*)|(\s*$)/g, "");
+            case 3:
+                return str.replace(/(^\s*)/g, "");
+            case 4:
+                return str.replace(/(\s*$)/g, "");
+            default:
+                return str;
+        }
+    },
+    /*type
+     1:首字母大写
+     2：首字母小写
+     3：大小写转换
+     4：全部大写
+     5：全部小写
+     * */
+    //changeCase('asdasd',1)
+    //result：Asdasd
+    changeCase(str, type) {
+        function ToggleCase(str) {
+            let itemText = ""
+            str.split("").forEach(item => {
+                if (/^([a-z]+)/.test(item)) {
+                    itemText += item.toUpperCase();
+                } else if (/^([A-Z]+)/.test(item)) {
+                    itemText += item.toLowerCase();
+                } else {
+                    itemText += item;
+                }
+            });
+            return itemText;
+        }
+
+        switch (type) {
+            case 1:
+                return str.replace(/\b\w+\b/g, function (word) {
+                    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+
+                });
+            case 2:
+                return str.replace(/\b\w+\b/g, function (word) {
+                    return word.substring(0, 1).toLowerCase() + word.substring(1).toUpperCase();
+                });
+            case 3:
+                return ToggleCase(str);
+            case 4:
+                return str.toUpperCase();
+            case 5:
+                return str.toLowerCase();
+            default:
+                return str;
+        }
+    },
+    //字符串循环复制
+    //repeatStr(str->字符串, count->次数)
+    //repeatStr('123',3)
+    //"result：123123123"
+    repeatStr(str, count) {
+        return str.repeat(count);
+    },
+    //字符串替换(字符串,要替换的字符或者正则表达式（不要写g）,替换成什么)
+    //ecDo.replaceAll('这里是上海，中国第三大城市，广东省省会，简称穗，','上海','广州')
+    //result："这里是广州，中国第三大城市，广东省省会，简称穗，"
+    replaceAll(str, AFindText, ARepText) {
+        let raRegExp = new RegExp(AFindText, "g");
+        return str.replace(raRegExp, ARepText);
+    },
+    //字符替换*
+    //replaceStr(字符串,字符格式, 替换方式,替换的字符（默认*）)
+    replaceStr(str, regArr, type = 0, ARepText = '*') {
+        let regtext = '',
+            Reg = null,
+            replaceText = ARepText;
+        //replaceStr('18819322663',[3,5,3],0)
+        //result：188*****663
+        //repeatStr是在上面定义过的（字符串循环复制），大家注意哦
+        if (regArr.length === 3 && type === 0) {
+            regtext = '(\\w{' + regArr[0] + '})\\w{' + regArr[1] + '}(\\w{' + regArr[2] + '})'
+            Reg = new RegExp(regtext);
+            let replaceCount = this.repeatStr(replaceText, regArr[1]);
+            return str.replace(Reg, '$1' + replaceCount + '$2')
+        }
+        //replaceStr('asdasdasdaa',[3,5,3],1)
+        //result：***asdas***
+        else if (regArr.length === 3 && type === 1) {
+            regtext = '\\w{' + regArr[0] + '}(\\w{' + regArr[1] + '})\\w{' + regArr[2] + '}'
+            Reg = new RegExp(regtext);
+            let replaceCount1 = this.repeatStr(replaceText, regArr[0]);
+            let replaceCount2 = this.repeatStr(replaceText, regArr[2]);
+            return str.replace(Reg, replaceCount1 + '$1' + replaceCount2)
+        }
+        //replaceStr('1asd88465asdwqe3',[5],0)
+        //result：*****8465asdwqe3
+        else if (regArr.length === 1 && type === 0) {
+            regtext = '(^\\w{' + regArr[0] + '})'
+            Reg = new RegExp(regtext);
+            let replaceCount = this.repeatStr(replaceText, regArr[0]);
+            return str.replace(Reg, replaceCount)
+        }
+        //replaceStr('1asd88465asdwqe3',[5],1,'+')
+        //result："1asd88465as+++++"
+        else if (regArr.length === 1 && type === 1) {
+            regtext = '(\\w{' + regArr[0] + '}$)'
+            Reg = new RegExp(regtext);
+            let replaceCount = this.repeatStr(replaceText, regArr[0]);
+            return str.replace(Reg, replaceCount)
+        }
+    },
+    //检测密码强度
+    //checkPwd('12asdASAD')
+    //result：3(强度等级为3)
+    checkPwd(str) {
+        let nowLv = 0;
+        if (str.length < 6) {
+            return nowLv
+        }
+        if (/[0-9]/.test(str)) {
+            nowLv++
+        }
+        if (/[a-z]/.test(str)) {
+            nowLv++
+        }
+        if (/[A-Z]/.test(str)) {
+            nowLv++
+        }
+        if (/[\.|-|_]/.test(str)) {
+            nowLv++
+        }
+        return nowLv;
+    },
+    //随机码
+    //count取值范围2-36
+
+    //randomWord(10)
+    //result："2584316588472575"
+
+    //randomWord(14)
+    //result："9b405070dd00122640c192caab84537"
+
+    //randomWord(36)
+    //result："83vhdx10rmjkyb9"
+
+    randomWord(count) {
+        return Math.random().toString(count).substring(2);
+    },
+
+    //查找字符串
+    //let strTest='sad44654blog5a1sd67as9dablog4s5d16zxc4sdweasjkblogwqepaskdkblogahseiuadbhjcibloguyeajzxkcabloguyiwezxc967'
+    //countStr(strTest,'blog')
+    //result：6
+    countStr(str, strSplit) {
+        return str.split(strSplit).length - 1
+    },
+    //过滤字符串(html标签，表情，特殊字符)
+    //字符串，替换内容（special-特殊字符,html-html标签,emjoy-emjoy表情,word-小写字母，WORD-大写字母，number-数字,chinese-中文），要替换成什么，默认'',保留哪些特殊字符
+    //如果需要过滤多种字符，type参数使用,分割，如下栗子
+    //过滤字符串的html标签，大写字母，中文，特殊字符，全部替换成*,但是特殊字符'%'，'?'，除了这两个，其他特殊字符全部清除
+    //let str='asd    654a大蠢sasdasdASDQWEXZC6d5#%^*^&*^%^&*$\\"\'#@!()*/-())_\'":"{}?<div></div><img src=""/>啊实打实大蠢猪自行车这些课程';
+    // ecDo.filterStr(str,'html,WORD,chinese,special','*','%?')
+    //result："asd    654a**sasdasd*********6d5#%^*^&*^%^&*$\"'#@!()*/-())_'":"{}?*****************"
+    filterStr(str, type, restr = '', spstr) {
+        let typeArr = type.split(','), _str = str;
+        for (let i = 0, len = typeArr.length; i < len; i++) {
+            //是否是过滤特殊符号
+            let pattern;
+            if (typeArr[i] === 'special') {
+                let regText = '$()[]{}?\|^*+./\"\'+';
+                //是否有哪些特殊符号需要保留
+                if (spstr) {
+                    let _spstr = spstr.split(""), _regText = "[^0-9A-Za-z\\s";
+                    for (let j = 0, len1 = _spstr.length; j < len1; j++) {
+                        if (regText.indexOf(_spstr[j]) === -1) {
+                            _regText += _spstr[j];
+                        }
+                        else {
+                            _regText += '\\' + _spstr[j];
+                        }
+                    }
+                    _regText += ']'
+                    pattern = new RegExp(_regText, 'g');
+                }
+                else {
+                    pattern = new RegExp("[^0-9A-Za-z\\s]", 'g')
+                }
+
+            }
+            switch (typeArr[i]) {
+                case 'special':
+                    _str = _str.replace(pattern, restr);
+                    break;
+                case 'html':
+                    _str = _str.replace(/<\/?[^>]*>/g, restr);
+                    break;
+                case 'emjoy':
+                    _str = _str.replace(/[^\u4e00-\u9fa5|\u0000-\u00ff|\u3002|\uFF1F|\uFF01|\uff0c|\u3001|\uff1b|\uff1a|\u3008-\u300f|\u2018|\u2019|\u201c|\u201d|\uff08|\uff09|\u2014|\u2026|\u2013|\uff0e]/g, restr);
+                    break;
+                case 'word':
+                    _str = _str.replace(/[a-z]/g, restr);
+                    break;
+                case 'WORD':
+                    _str = _str.replace(/[A-Z]/g, restr);
+                    break;
+                case 'number':
+                    _str = _str.replace(/[0-9]/g, restr);
+                    break;
+                case 'chinese':
+                    _str = _str.replace(/[\u4E00-\u9FA5]/g, restr);
+                    break;
+            }
+        }
+        return _str;
+    },
+    //格式化处理字符串
+    //ecDo.formatText('1234asda567asd890')
+    //result："12,34a,sda,567,asd,890"
+    //ecDo.formatText('1234asda567asd890',4,' ')
+    //result："1 234a sda5 67as d890"
+    //ecDo.formatText('1234asda567asd890',4,'-')
+    //result："1-234a-sda5-67as-d890"
+    formatText(str, size = 3, delimiter = ',') {
+        let regText = '\\B(?=(\\w{' + size + '})+(?!\\w))';
+        let reg = new RegExp(regText, 'g');
+        return str.replace(reg, delimiter);
+    },
+    //找出最长单词 (Find the Longest word in a String)
+    //longestWord('Find the Longest word in a String')
+    //result：7
+    //longestWord('Find|the|Longest|word|in|a|String','|')
+    //result：7
+    longestWord(str, splitType = /\s+/g) {
+        let _max = 0, _item = '';
+        let strArr = str.split(splitType);
+        strArr.forEach(item => {
+            if (_max < item.length) {
+                _max = item.length;
+                _item = item;
+            }
+        });
+        return { el: _item, max: _max };
+    },
+    //句中单词首字母大写 (Title Case a Sentence)
+    //这个我也一直在纠结，英文标题，即使是首字母大写，也未必每一个单词的首字母都是大写的，但是又不知道哪些应该大写，哪些不应该大写
+    //ecDo.titleCaseUp('this is a title')
+    //"This Is A Title"
+    titleCaseUp(str, splitType = /\s+/g) {
+        let strArr = str.split(splitType),
+            result = "";
+        strArr.forEach(item => {
+            result += this.changeCase(item, 1) + ' ';
+        });
+        return this.trim(result, 4)
+    },
+
+    //++++++cookie++++++
+    //设置cookie
+    setCookie(name, value, iDay) {
+        let oDate = new Date();
+        oDate.setDate(oDate.getDate() + iDay);
+        document.cookie = name + '=' + value + ';expires=' + oDate;
+    },
+    //获取cookie
+    getCookie(name) {
+        let arr = document.cookie.split('; '), arr2;
+        for (let i = 0; i < arr.length; i++) {
+            arr2 = arr[i].split('=');
+            if (arr2[0] == name) {
+                return arr2[1];
+            }
+        }
+        return '';
+    },
+    //删除cookie
+    removeCookie(name) {
+        this.setCookie(name, 1, -1);
+    },
+    //图片滚动懒加载
+    //@className {string} 要遍历图片的类名
+    //@num {number} 距离多少的时候开始加载 默认 0
+    //比如，一张图片距离文档顶部3000，num参数设置200，那么在页面滚动到2800的时候，图片加载。不传num参数就滚动，num默认是0，页面滚动到3000就加载
+    //html代码
+    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>
+    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>
+    //<p><img data-src="lawyerOtherImg.jpg" class="load-img" width='528' height='304' /></p>....
+    //data-src储存src的数据，到需要加载的时候把data-src的值赋值给src属性，图片就会加载。
+    //详细可以查看testLoadImg.html
+
+    //window.onload = function() {
+    //	loadImg('load-img',100);
+    //	window.onscroll = function() {
+    //		loadImg('load-img',100);
+    //		}
+    //}
+    loadImg(className = 'ec-load-img', num = 0, errorUrl = null) {
+        let oImgLoad = document.getElementsByClassName(className);
+        for (let i = 0, len = oImgLoad.length; i < len; i++) {
+            //如果图片已经滚动到指定的高度
+            if (document.documentElement.clientHeight + document.documentElement.scrollTop > oImgLoad[i].offsetTop - num && !oImgLoad[i].isLoad) {
+                //记录图片是否已经加载
+                oImgLoad[i].isLoad = true;
+                //设置过渡，当图片下来的时候有一个图片透明度变化
+                oImgLoad[i].style.cssText = "transition: ''; opacity: 0;";
+                if (oImgLoad[i].dataset) {
+                    this.aftLoadImg(oImgLoad[i], oImgLoad[i].dataset.src, errorUrl, function (o) {
+                        //添加定时器，确保图片已经加载完了，再把图片指定的的class，清掉，避免重复编辑
+                        setTimeout(() => {
+                            if (o.isLoad) {
+                                this.removeClass(o, className);
+                                o.style.cssText = "";
+                            }
+                        }, 1000)
+                    });
+                } else {
+                    this.aftLoadImg(oImgLoad[i], oImgLoad[i].getAttribute("data-src"), errorUrl, function (o) {
+                        //添加定时器，确保图片已经加载完了，再把图片指定的的class，清掉，避免重复编辑
+                        setTimeout(() => {
+                            if (o.isLoad) {
+                                this.removeClass(o, className);
+                                o.style.cssText = "";
+                            }
+                        }, 1000)
+                    });
+                }
+                (function (i) {
+                    setTimeout(() => {
+                        oImgLoad[i].style.cssText = "transition:all 1s; opacity: 1;";
+                    }, 16)
+                })(i);
+            }
+        }
+    },
 }
